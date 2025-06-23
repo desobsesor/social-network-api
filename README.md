@@ -90,6 +90,11 @@ _Set configuration.env_
 Set your environment variables in the .env file
 ```
 
+_Set initial data in seeder_
+```bash
+npm run seed   
+```
+
 _Compile the project and start the server_
 
 ```bash
