@@ -21,6 +21,7 @@ import { AppGateway } from './infrastructure/sockets/appGateway.gateway';
 import { EventsGateway } from './infrastructure/sockets/events.gateway';
 import { ThrottlerGuard } from './infrastructure/throttler/throttler.guard';
 import { AppThrottlerModule } from './infrastructure/throttler/throttler.module';
+import { JwtAuthGuard } from './infrastructure/auth/jwt-auth.guard';
 
 @Module({
   imports: [
@@ -49,12 +50,16 @@ import { AppThrottlerModule } from './infrastructure/throttler/throttler.module'
     ExceptionsModule,
   ],
   providers: [
-    EventsGateway,
     AppGateway,
+    EventsGateway,
+    /*{
+      provide: APP_GUARD,
+      useClass: JwtAuthGuard
+    },
     {
       provide: APP_GUARD,
-      useClass: ThrottlerGuard,
-    },
+      useClass: ThrottlerGuard
+    },*/
   ],
 })
 export class AppModule { }

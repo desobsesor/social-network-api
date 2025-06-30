@@ -5,6 +5,7 @@ import { Repository } from 'typeorm';
 import { AppLoggerService } from '../../helpers/logger/logger.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
+import { QueryUserDto } from './dto/query-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -44,10 +45,15 @@ export class UsersService {
      * @returns User[]
      */
     async findAll(): Promise<User[]> {
-        return await this.userRepository.find({
-            relations: ['role'],
-            // relations: ['role', 'course.hightSchool'], // Uncomment and adjust if 'course' and 'hightSchool' are TypeORM relations
+        return await this.userRepository.find();
+    }
+
+    async findAllPaginated(page: number, pageSize: number): Promise<QueryUserDto> {
+        const [users, total] = await this.userRepository.findAndCount({
+            skip: (page - 1) * pageSize,
+            take: pageSize,
         });
+        return { users, total };
     }
 
     /**
@@ -57,8 +63,7 @@ export class UsersService {
     async findByUsername(username: string): Promise<User | undefined> {
         this.logger.log(`Finding user by username: ${username}`);
         return this.userRepository.findOne({
-            where: { username },
-            relations: ['role', 'company'],
+            where: { username }
         });
     }
 
@@ -83,7 +88,6 @@ export class UsersService {
     async findByEmailAndPassword(email: string, passwordHash: string): Promise<User | undefined> {
         const user = await this.userRepository.findOne({
             where: { email },
-            // relations: ['role', 'company'],
         });
 
         if (!user) {

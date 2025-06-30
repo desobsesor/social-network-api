@@ -17,9 +17,9 @@ export class PostSeeder {
     }
 
     const postsData = [
-      { content: 'This is my first post in this social network!', user: users.find(u => u.username === 'yosuarez') },
-      { content: 'This post talks about the best of react and nestjs.', user: users.find(u => u.username === 'ansuarez') },
-      { content: 'Storing data in PostgreSQL is essential for our social network data.', user: users.find(u => u.username === 'sesuarez') },
+      { content: 'This is my first post in this social network!', user: users.find(u => u.username === 'yosuarez'), labels: ['tech', 'programming'] },
+      { content: 'This post talks about the best of react and nestjs.', user: users.find(u => u.username === 'ansuarez'), labels: ['tech', 'programming'] },
+      { content: 'Storing data in PostgreSQL is essential for our social network data.', user: users.find(u => u.username === 'sesuarez'), labels: ['tech', 'programming'] },
     ];
 
     for (const postData of postsData) {

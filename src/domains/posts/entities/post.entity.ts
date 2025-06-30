@@ -47,4 +47,10 @@ export class Post {
   @OneToMany(() => PostRating, postRating => postRating.post)
   postRatings: PostRating[];
 
+  /**
+   * The labels associated with the post.
+   */
+  @Column({ type: 'text', array: true, default: [] })
+  labels: string[];
+
 }

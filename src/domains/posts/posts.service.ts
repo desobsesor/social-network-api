@@ -4,28 +4,44 @@ import { Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { ReadPostDto } from './dto/read-post.dto';
+import { QueryPostDto } from './dto/query-post.dto';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class PostsService {
   constructor(
-    @InjectRepository(Post)
-    private postsRepository: Repository<Post>,
+    @InjectRepository(Post) private postsRepository: Repository<Post>,
+    @InjectRepository(User) private usersRepository: Repository<User>,
   ) { }
 
-  create(createPostDto: CreatePostDto) {
-    const post = this.postsRepository.create(createPostDto);
+  async create(createPostDto: CreatePostDto): Promise<Post> {
+    const user = await this.usersRepository.findOne({ where: { userId: createPostDto.userId } });
+    const post = this.postsRepository.create({ ...createPostDto, user });
     return this.postsRepository.save(post);
   }
 
-  findAll() {
-    return this.postsRepository.find();
+  async findAll(): Promise<Post[]> {
+    return await this.postsRepository.find();
   }
 
-  findAllByUser(userId: number) {
+  async findAllPaginated(page: number, pageSize: number): Promise<QueryPostDto> {
+    const [posts, total] = await this.postsRepository.findAndCount({
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+      order: {
+        createdAt: 'DESC',
+      },
+      relations: ['user'],
+    });
+    return { posts, total };
+  }
+
+  async findAllByUser(userId: number): Promise<Post[]> {
     return this.postsRepository.find({ where: { user: { userId } } });
   }
 
-  findOne(id: number) {
+  async findOne(id: number) {
     return this.postsRepository.findOne({ where: { postId: id } });
   }
 

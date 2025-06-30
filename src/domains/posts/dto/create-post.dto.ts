@@ -30,5 +30,14 @@ export class CreatePostDto {
   @ApiProperty({ description: 'The creation timestamp of the post.', example: '2023-10-27T10:00:00Z' })
   @IsString()
   @IsNotEmpty()
-  created_at: Date;
+  createdAt: Date;
+
+  /**
+   * The labels associated with the post.
+   * @example ['Esferas', 'Portales', 'Ultradimensionales', 'programming']
+   */
+  @ApiProperty({ description: 'The labels associated with the post.', example: ['Esferas', 'Portales', 'Ultradimensionales', 'programming'] })
+  @IsString({ each: true })
+  @IsNotEmpty({ each: true })
+  labels: string[];
 }

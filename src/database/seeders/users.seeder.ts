@@ -13,11 +13,12 @@ export class UserSeeder {
         lastName: 'Suárez Silva',
         username: 'yosuarez',
         email: 'yovany@suarez.com',
-        passwordHash: 'yosuarez',
-        alias: 'yosuarez',
+        passwordHash: 'maya',
+        alias: 'desobsesor',
         dateOfBirth: '1983-03-09',
         isLogged: true,
-        role: 'Member'
+        role: 'Member',
+        avatar: '03.jpg'
       },
       {
         firstName: 'André',
@@ -28,7 +29,8 @@ export class UserSeeder {
         alias: 'ansuarez',
         dateOfBirth: '2014-03-15',
         isLogged: true,
-        role: 'Member'
+        role: 'Member',
+        avatar: '04.jpg'
       },
       {
         firstName: 'Selena',
@@ -39,7 +41,8 @@ export class UserSeeder {
         alias: 'sesuarez',
         dateOfBirth: '2012-04-16',
         isLogged: true,
-        role: 'Member'
+        role: 'Member',
+        avatar: '05.jpg'
       },
     ];
 

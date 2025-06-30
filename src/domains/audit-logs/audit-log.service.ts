@@ -55,6 +55,7 @@ export class AuditLogService {
         return auditLogs.map(auditLog => ({
             auditLogId: auditLog.auditLogId,
             userId: auditLog.user.userId,
+            user: auditLog.user,
             action: auditLog.action,
             entity: auditLog.entity,
             details: auditLog.details,
@@ -108,6 +109,7 @@ export class AuditLogService {
         return auditLogs.map(auditLog => ({
             auditLogId: auditLog.auditLogId,
             userId: auditLog.user.userId,
+            user: auditLog.user,
             action: auditLog.action,
             entity: auditLog.entity,
             details: auditLog.details,
@@ -134,6 +136,7 @@ export class AuditLogService {
         return {
             auditLogId: auditLog.auditLogId,
             userId: auditLog.user.userId,
+            user: auditLog.user,
             action: auditLog.action,
             entity: auditLog.entity,
             details: auditLog.details,

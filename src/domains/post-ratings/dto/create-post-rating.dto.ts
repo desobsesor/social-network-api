@@ -11,7 +11,7 @@ export class CreatePostRatingDto {
   @ApiProperty({ description: 'The rating type.', example: 'like' })
   @IsString()
   @IsNotEmpty()
-  ratingType: string;
+  type: string;
 
   @ApiProperty({ description: 'The post ID associated with the rating.', example: 1 })
   @IsInt()

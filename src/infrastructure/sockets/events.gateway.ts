@@ -23,7 +23,6 @@ export class EventsGateway {
      */
     @SubscribeMessage('clientEvent')
     handleClientEvent(@MessageBody() data: string, @ConnectedSocket() client: Socket) {
-        //console.log('Mensaje recibido del cliente:', data);
         this.server.emit('customNameEvent', `El servidor responde: ${data}`);
     }
 }
