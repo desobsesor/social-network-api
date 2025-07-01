@@ -1,10 +1,10 @@
 import { Body, Controller, Get, Param, Post, Query, UseGuards, UsePipes, ValidationPipe } from '@nestjs/common';
 import { ApiBearerAuth, ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auths';
 import { AuditLogService } from './audit-log.service';
 import { CreateAuditLogDto } from './dto/create-audit-log.dto';
 import { ReadAuditLogDto } from './dto/read-audit-log.dto';
 import { SearchAuditLogDto } from './dto/search-audit-log.dto';
+import { JwtAuthGuard } from 'src/infrastructure/auth/jwt-auth.guard';
 
 /**
  * Controller to manage audit logs
@@ -31,7 +31,7 @@ export class AuditLogController {
         isArray: true,
     })
     async getAllAuditLogs(): Promise<ReadAuditLogDto[]> {
-        return this.auditLogService.getAuditLog();
+        return await this.auditLogService.getAuditLog();
     }
 
     /**

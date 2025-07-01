@@ -1,8 +1,11 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
-import { ApiOperation, ApiTags } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { ReadPostDto } from './dto/read-post.dto';
+import { QueryPostDto } from './dto/query-post.dto';
+import { JwtAuthGuard } from 'src/infrastructure/auth/jwt-auth.guard';
 
 @Controller('api/posts')
 @ApiTags('Managing user posts on the social network')
@@ -11,20 +14,42 @@ export class PostsController {
 
   @Post()
   @ApiOperation({ summary: 'Create a new post', description: 'Creates a new post with the provided content and associates it with a user.' })
-  create(@Body() createPostDto: CreatePostDto) {
+  async create(@Body() createPostDto: CreatePostDto): Promise<ReadPostDto> {
     return this.postsService.create(createPostDto);
   }
 
   @Get('all')
   @ApiOperation({ summary: 'Get all posts', description: 'Retrieves a list of all posts of all users' })
-  findAll() {
-    return this.postsService.findAll();
+  //@ApiBearerAuth()
+  //@UseGuards(JwtAuthGuard)
+  async findAll(): Promise<QueryPostDto> {
+    const { posts, total } = await this.postsService.findAllPaginated(1, 10);
+    const postsTransform = posts.map(post => ({
+      postId: post.postId,
+      content: post.content,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      user: post.user,
+      labels: post.labels
+    }));
+    return {
+      posts: postsTransform,
+      total: total,
+    };
   }
 
   @Get('by-user')
   @ApiOperation({ summary: 'Get posts by user', description: 'Retrieves a list of posts created by a specific user' })
-  findAllByUser(@Body('userId') userId: number) {
-    return this.postsService.findAllByUser(userId);
+  async findAllByUser(@Body('userId') userId: number): Promise<ReadPostDto[]> {
+    const posts = await this.postsService.findAllByUser(userId);
+    return posts.map(post => ({
+      postId: post.postId,
+      content: post.content,
+      createdAt: post.createdAt,
+      updatedAt: post.updatedAt,
+      user: post.user,
+      labels: post.labels
+    }));
   }
 
   @Get(':id')

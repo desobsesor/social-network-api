@@ -4,9 +4,11 @@ Social Network API
 
 <p align="center">
 <img width="200" alt="Logo" style="border:2px solid #EAEAEA; border-radius:10px;" src="./public/assets/logo-social-network-min.png" alt="logo-social-network" />
-
 </p>
-This API provides services for Social Network Web Application for people of all galactic races.
+<h2 align="center">
+Galactic Connection 
+</h2>
+This API provides services for a social networking web application for beings of all galactic races.
 
 ## Technologies 🔧
 
@@ -75,7 +77,7 @@ See **Deployment** to learn how to deploy the project.
 _Clone the social-network-api repository from github_
 
 ```bash
-git clone https://github.com/Guarnizo2023/social-network-api.git
+git clone https://github.com/desobsesor/social-network-api.git
 ```
 
 _Install the dependencies_
@@ -88,6 +90,11 @@ _Set configuration.env_
 
 ```bash
 Set your environment variables in the .env file
+```
+
+_Set initial data in seeder_
+```bash
+npm run seed   
 ```
 
 _Compile the project and start the server_

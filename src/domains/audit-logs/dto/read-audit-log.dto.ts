@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { User } from 'src/domains/users/entities/user.entity';
 
 /**
  * Data Transfer Object for reading audit log entries.
@@ -9,6 +10,9 @@ export class ReadAuditLogDto {
 
   @ApiProperty({ description: 'The ID of the user associated with the audit log entry.', example: 1 })
   userId: number;
+
+  @ApiProperty({ description: 'The user associated with the audit log entry.', type: User })
+  user: User;
 
   @ApiProperty({ description: 'The action performed in the audit log entry.', example: 'USER_LOGIN' })
   action: string;

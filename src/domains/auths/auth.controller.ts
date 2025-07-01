@@ -3,8 +3,8 @@ import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
-import { JwtAuthGuard } from './jwt-auth.guard';
-import { ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from '../../infrastructure/auth/jwt-auth.guard';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 
 @Controller('api/auths')
 @ApiTags('Authentication for user login')
@@ -30,19 +30,14 @@ export class AuthController {
         return this.authService.verifyToken(body.token);
     }
 
-    @Post('validate')
-    @UseGuards(JwtAuthGuard)
-    async findByEmailAndPassword(@Body('email') email: string, @Body('password') password: string) {
-        console.info('User email and password: ', email, password);
-        return this.authService.validate(email, password);
-    }
-
     @Post('logout')
-    @UseGuards(JwtAuthGuard)
-    async logout(@Request() req: any, @Body() body: { userId: string }) {
+    //@ApiBearerAuth()
+    //@UseGuards(JwtAuthGuard)
+    async logout(@Request() req: any, @Body() body: { userId: number }) {
+        console.log('req: ', req);
         await this.usersService.updateIsLogged({
             userId: body.userId,
-            isLogged: true
+            isLogged: false
         } as unknown as User);
 
         await this.authService.invalidateToken(body.userId);

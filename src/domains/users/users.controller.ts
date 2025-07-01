@@ -1,12 +1,13 @@
-import { Body, Controller, Get, Post, Put, Request } from '@nestjs/common';
+import { Body, Controller, Get, Post, Put, Request, UseGuards } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { EventsGateway } from '../../infrastructure/sockets/events.gateway';
-import { JwtAuthGuard } from '../auths';
 import { CreateUserDto } from './dto/create-user.dto';
 import { ReadUserDto } from './dto/read-user.dto';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { QueryUserDto } from './dto/query-user.dto';
+import { JwtAuthGuard } from 'src/infrastructure/auth/jwt-auth.guard';
 
 @Controller('api/users')
 @ApiTags('Managing users on the social network')
@@ -57,9 +58,9 @@ export class UsersController {
         isArray: true,
     })
     //@UseGuards(JwtAuthGuard)
-    async findAll(): Promise<ReadUserDto[]> {
-        const users = await this.usersService.findAll();
-        return users.map(user => ({
+    async findAll(): Promise<QueryUserDto> {
+        const { users, total } = await this.usersService.findAllPaginated(1, 10);
+        const usersTransform = users.map(user => ({
             userId: user.userId,
             username: user.username,
             email: user.email,
@@ -69,6 +70,10 @@ export class UsersController {
             isLogged: user.isLogged,
             avatar: user.avatar
         }));
+        return {
+            users: usersTransform,
+            total: total,
+        };
     }
 
     @Get('profile')

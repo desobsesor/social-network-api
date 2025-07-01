@@ -19,7 +19,7 @@
     "noFallthroughCasesInSwitch": false,
     "typeRoots": ["node_modules/@types"]
   },
-    "include": ["src/**/*.ts"],
+    "include": ["src/**/*.ts", "src/database/seed.ts"],
     "exclude": ["node_modules", "dist"],
     "incremental": true
   }

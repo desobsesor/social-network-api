@@ -3,9 +3,10 @@ import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import { User } from '../users/entities/user.entity';
 import { UsersService } from '../users/users.service';
+import { Gender } from 'src/utils/enum';
 
 interface InvalidatedToken {
-    userId: string;
+    userId: number;
     timestamp: number;
     reason?: string;
 }
@@ -13,7 +14,7 @@ interface InvalidatedToken {
 @Injectable()
 export class AuthService {
     // Map to store invalidated tokens by userId
-    private invalidatedTokens: Map<string, InvalidatedToken> = new Map();
+    private invalidatedTokens: Map<number, InvalidatedToken> = new Map();
 
     // Expiration time for cleaning invalidated tokens (24 hours in ms)
     private readonly TOKEN_CLEANUP_INTERVAL = 24 * 60 * 60 * 1000;
@@ -26,18 +27,13 @@ export class AuthService {
         setInterval(() => this.cleanupInvalidatedTokens(), this.TOKEN_CLEANUP_INTERVAL);
     }
 
-    async validateUser(email: string, userName: string, password: string): Promise<any> {
+    async validateUser(userName: string, password: string): Promise<any> {
         let user: User;
-
-        if (email) {
-            user = await this.usersService.findByEmailAndPassword(email, password);
-        } else if (userName) {
-            user = await this.usersService.findByUsername(userName);
-            if (user) {
-                const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
-                if (!isPasswordValid) {
-                    user = null;
-                }
+        user = await this.usersService.findByUsername(userName);
+        if (user) {
+            const isPasswordValid = await bcrypt.compareSync(password, user.passwordHash);
+            if (!isPasswordValid) {
+                user = null;
             }
         }
 
@@ -51,21 +47,17 @@ export class AuthService {
 
     async generateToken(user: Partial<User> | any) {
         const payload = {
-            documentNumber: user.documentNumber,
+            alias: user.alias,
             firstName: user.firstName,
             lastName: user.lastName,
             username: user.username,
-            sub: user.userId,
+            userId: user.userId,
             email: user.email,
-            role: {
-                _id: user.role._id,
-                name: user.role?.name
-            },
-            company: {
-                _id: user.company._id,
-                name: user.company?.name
-            },
-            avatar: user.avatar
+            role: user.role,
+            avatar: user.avatar,
+            isLogged: true,
+            createdAt: user.createdAt,
+            gender: user.gender
         };
 
         console.log("payload:", payload);
@@ -75,14 +67,15 @@ export class AuthService {
     }
 
     async login(loginDto: any) {
-        const { email, username, passwordHash } = loginDto;
+        const { username, passwordHash } = loginDto;
 
-        if (!email && !username) {
+        if (!username) {
             throw new UnauthorizedException('Email or username is required');
         }
-        const user = await this.validateUser(email, username, passwordHash);
+        const user = await this.validateUser(username, passwordHash);
+
         if (!user) {
-            throw new UnauthorizedException('Invalid credentials');
+            throw new UnauthorizedException('Invalid credentials ***');
         }
 
         if (user) {
@@ -102,7 +95,7 @@ export class AuthService {
             const decoded = this.jwtService.verify(token);
 
             // Check if the token has been invalidated
-            if (this.isTokenInvalidated(decoded.sub)) {
+            if (this.isTokenInvalidated(decoded.userId)) {
                 throw new UnauthorizedException('Token has been invalidated');
             }
 
@@ -116,12 +109,12 @@ export class AuthService {
         const user = await this.usersService.findByEmailAndPassword(email, passwordHash);
 
         if (!user) {
-            throw new UnauthorizedException('Invalid credentials');
+            throw new UnauthorizedException('Invalid credentials...');
         }
 
         // Generate JWT token with user data
         const payload = {
-            sub: user.userId,
+            userId: user.userId,
             email: user.email,
             username: user.username,
             role: 'Member'
@@ -149,7 +142,7 @@ export class AuthService {
     * @param reason - Optional reason for the invalidation
     * @returns Object with the operation's status
      */
-    async invalidateToken(userId: string, reason?: string): Promise<{ success: boolean }> {
+    async invalidateToken(userId: number, reason?: string): Promise<{ success: boolean }> {
         try {
             this.invalidatedTokens.set(userId, {
                 userId,
@@ -169,7 +162,7 @@ export class AuthService {
     * @param userId - ID of the user to check
     * @returns true if the token is invalidated, false otherwise
     */
-    private isTokenInvalidated(userId: string): boolean {
+    private isTokenInvalidated(userId: number): boolean {
         return this.invalidatedTokens.has(userId);
     }
 

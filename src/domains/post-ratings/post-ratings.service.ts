@@ -32,11 +32,42 @@ export class PostRatingsService {
   }
 
   async findAllByPost(postId: number) {
-    const post = await this.postsRepository.findOne({ where: { postId } });
+    const post = await this.postsRepository.findOne({
+      where: { postId }
+    });
     if (!post) {
       throw new NotFoundException('Post not found');
     }
-    return this.postRatingsRepository.find({ where: { post: { postId } } });
+    return this.postRatingsRepository.find({
+      relations: ['post', 'user'],
+      where: { post: { postId } }
+    });
+  }
+
+  async findAllByPostAndUser(postId: number, userId: number) {
+    console.log(postId, userId);
+    const post = await this.postsRepository.findOne({ where: { postId } });
+    const user = await this.usersRepository.findOne({ where: { userId } });
+    if (!post || !user) {
+      throw new NotFoundException('Post or User not found');
+    }
+    return this.postRatingsRepository.find({
+      relations: ['post', 'user'],
+      select: {
+        post: {
+          postId: true,
+          labels: true,
+          content: true,
+        },
+        user: {
+          userId: true,
+          username: true,
+          firstName: true,
+          lastName: true
+        },
+      },
+      where: { post: { postId }, user: { userId } }
+    });
   }
 
   async findAllByUser(userId: number) {
